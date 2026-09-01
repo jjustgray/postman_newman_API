@@ -30,9 +30,7 @@ jobs:
 
       - name: Start Local Backend Server in Background
         run: |
-          # Запускаем локальный сервер в фоне (убедись, что в package.json подстрока запуска называется 'start'. Если там другой скрипт, замени 'npm start' на 'npm run имя_скрипта')
-          npm start &
-          # Ждем 5 секунд, чтобы сервер успел поднять порт 3000 и инициализироваться
+          npm run tern-on-api &
           sleep 5
 
       - name: Run Postman Tests via Newman

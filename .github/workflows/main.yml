@@ -1,4 +1,4 @@
-name: Postman API Tests with Newman
+name: Postman API Tests with Local Server
 
 on:
   push:
@@ -20,16 +20,27 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Install Project Dependencies
+        run: |
+          npm install
+
       - name: Install Newman and HTML Extra Reporter
         run: |
           npm install -g newman newman-reporter-htmlextra
 
-      - name: Run Postman tests via Newman
+      - name: Start Local Backend Server in Background
+        run: |
+          # Запускаем локальный сервер в фоне (убедись, что в package.json подстрока запуска называется 'start'. Если там другой скрипт, замени 'npm start' на 'npm run имя_скрипта')
+          npm start &
+          # Ждем 5 секунд, чтобы сервер успел поднять порт 3000 и инициализироваться
+          sleep 5
+
+      - name: Run Postman Tests via Newman
         run: |
           mkdir -p public
           newman run store.collection.json -r htmlextra --reporter-htmlextra-export public/index.html --reporter-htmlextra-darkTheme
 
-      - name: Deploy report to GitHub Pages
+      - name: Deploy Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

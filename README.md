@@ -38,7 +38,7 @@ Examples:
 8. Push to you github repo in main branch ( in case with local server - save local server as well )
 
 ###  GH actions practice / Second Task
-9. Add Github action to run `petstore.collection.json` in Github pages by <a href="https://www.linkedin.com/pulse/running-postman-collections-via-github-action-nirmala-jayasanka"> article </a> or use another GH action.
+9. Add Github action to run `store.collection.json` in Github pages by <a href="https://www.linkedin.com/pulse/running-postman-collections-via-github-action-nirmala-jayasanka"> article </a> or use another GH action.
 10. Check github actions for result.
 
 

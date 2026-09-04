@@ -58,8 +58,8 @@ jobs:
           <body>
             <h1>Результаты прогона Postman тестов</h1>
             <ul>
-              <li><a href="store.html" target="_blank">Отчет: Store Collection</a></li>
-              <li><a href="petstore.html" target="_blank">Отчет: Petstore Collection</a></li>
+              <li><a href="store.html" target="_blank">Report: Store Collection</a></li>
+              <li><a href="petstore.html" target="_blank">Report: Petstore Collection</a></li>
             </ul>
           </body>
           </html>

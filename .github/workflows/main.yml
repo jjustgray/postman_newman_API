@@ -39,7 +39,6 @@ jobs:
           newman run store.collection.json -r htmlextra --reporter-htmlextra-export public/store.html --reporter-htmlextra-darkTheme --suppress-exit-code
           newman run petstore.collection.json -r htmlextra --reporter-htmlextra-export public/petstore.html --reporter-htmlextra-darkTheme --suppress-exit-code
 
-          # Создаем index.html для навигации по отчетам
           cat << 'EOF' > public/index.html
           <!DOCTYPE html>
           <html lang="ru">
@@ -56,7 +55,7 @@ jobs:
             </style>
           </head>
           <body>
-            <h1>Результаты прогона Postman тестов</h1>
+            <h1>Results execution Postman tests</h1>
             <ul>
               <li><a href="store.html" target="_blank">Report: Store Collection</a></li>
               <li><a href="petstore.html" target="_blank">Report: Petstore Collection</a></li>

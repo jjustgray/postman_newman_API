@@ -33,12 +33,37 @@ jobs:
           npm run tern-on-api &
           sleep 5
 
-      - name: Run Postman Tests via Newman
+      - name: Run Postman Tests via Newman and Generate Index
         run: |
           mkdir -p public
           newman run store.collection.json -r htmlextra --reporter-htmlextra-export public/store.html --reporter-htmlextra-darkTheme --suppress-exit-code
           newman run petstore.collection.json -r htmlextra --reporter-htmlextra-export public/petstore.html --reporter-htmlextra-darkTheme --suppress-exit-code
 
+          # Создаем index.html для навигации по отчетам
+          cat << 'EOF' > public/index.html
+          <!DOCTYPE html>
+          <html lang="ru">
+          <head>
+            <meta charset="UTF-8">
+            <title>Postman Test Reports</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 40px; background: #1a1a1a; color: #fff; }
+              h1 { color: #00d2ff; }
+              ul { list-style: none; padding: 0; }
+              li { margin: 15px 0; }
+              a { font-size: 18px; color: #4db8ff; text-decoration: none; border: 1px solid #4db8ff; padding: 10px 20px; border-radius: 5px; display: inline-block; }
+              a:hover { background: #4db8ff; color: #000; }
+            </style>
+          </head>
+          <body>
+            <h1>Результаты прогона Postman тестов</h1>
+            <ul>
+              <li><a href="store.html" target="_blank">Отчет: Store Collection</a></li>
+              <li><a href="petstore.html" target="_blank">Отчет: Petstore Collection</a></li>
+            </ul>
+          </body>
+          </html>
+          EOF
       - name: Deploy Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:

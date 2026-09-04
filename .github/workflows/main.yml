@@ -36,7 +36,7 @@ jobs:
       - name: Run Postman Tests via Newman
         run: |
           mkdir -p public
-          newman run store.collection.json -r htmlextra --reporter-htmlextra-export public/index.html --reporter-htmlextra-darkTheme
+          newman run store.collection.json petstore.collection.json -r htmlextra --reporter-htmlextra-export public/index.html --reporter-htmlextra-darkTheme
 
       - name: Deploy Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

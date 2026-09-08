@@ -23,6 +23,7 @@ jobs:
       - name: Install Project Dependencies
         run: |
           npm install
+          npm install --save-dev wait-on
 
       - name: Install Newman and HTML Extra Reporter
         run: |

@@ -12,6 +12,140 @@
       "name": "pet",
       "item": [
         {
+          "name": "Updates a pet in the store with form data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Response status code is 404\", function () {\r",
+                  "    pm.expect(pm.response.code).to.equal(404);\r",
+                  "});\r",
+                  "\r",
+                  "const apiResponseSchema = {\r",
+                  "    \"type\": \"object\",\r",
+                  "    \"required\": [\"code\", \"type\", \"message\"],\r",
+                  "    \"properties\": {\r",
+                  "        \"code\": { \"type\": \"integer\", \"minimum\": 0 },\r",
+                  "        \"type\": { \"type\": \"string\" },\r",
+                  "        \"message\": { \"type\": \"string\", \"minLength\": 1 }\r",
+                  "    }\r",
+                  "};\r",
+                  "\r",
+                  "pm.test(\"Response payload matches API Response JSON schema\", function () {\r",
+                  "    pm.response.to.have.jsonSchema(apiResponseSchema);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "ex",
+                  "description": "Updated name of the pet"
+                },
+                {
+                  "key": "status",
+                  "value": "eu",
+                  "description": "Updated status of the pet",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pet/:petId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pet",
+                ":petId"
+              ],
+              "variable": [
+                {
+                  "key": "petId",
+                  "value": "1337",
+                  "description": "(Required) ID of pet that needs to be updated"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Invalid input",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "description": "Added as a part of security scheme: oauth2",
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "name",
+                      "value": "ex",
+                      "description": "Updated name of the pet"
+                    },
+                    {
+                      "key": "status",
+                      "value": "eu",
+                      "description": "Updated status of the pet"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/pet/:petId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pet",
+                    ":petId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "petId",
+                      "value": "-8609067",
+                      "description": "(Required) ID of pet that needs to be updated"
+                    }
+                  ]
+                }
+              },
+              "status": "Method Not Allowed",
+              "code": 405,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
           "name": "Find pet by ID",
           "event": [
             {
@@ -225,140 +359,6 @@
               },
               "status": "Not Found",
               "code": 404,
-              "_postman_previewlanguage": "text",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "text/plain"
-                }
-              ],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "Updates a pet in the store with form data",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Response status code is 404\", function () {\r",
-                  "    pm.expect(pm.response.code).to.equal(404);\r",
-                  "});\r",
-                  "\r",
-                  "const apiResponseSchema = {\r",
-                  "    \"type\": \"object\",\r",
-                  "    \"required\": [\"code\", \"type\", \"message\"],\r",
-                  "    \"properties\": {\r",
-                  "        \"code\": { \"type\": \"integer\", \"minimum\": 0 },\r",
-                  "        \"type\": { \"type\": \"string\" },\r",
-                  "        \"message\": { \"type\": \"string\", \"minLength\": 1 }\r",
-                  "    }\r",
-                  "};\r",
-                  "\r",
-                  "pm.test(\"Response payload matches API Response JSON schema\", function () {\r",
-                  "    pm.response.to.have.jsonSchema(apiResponseSchema);\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "name",
-                  "value": "ex",
-                  "description": "Updated name of the pet"
-                },
-                {
-                  "key": "status",
-                  "value": "eu",
-                  "description": "Updated status of the pet",
-                  "disabled": true
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{baseUrl}}/pet/:petId",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "pet",
-                ":petId"
-              ],
-              "variable": [
-                {
-                  "key": "petId",
-                  "value": "1337",
-                  "description": "(Required) ID of pet that needs to be updated"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Invalid input",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "description": "Added as a part of security scheme: oauth2",
-                    "key": "Authorization",
-                    "value": "<token>"
-                  }
-                ],
-                "body": {
-                  "mode": "urlencoded",
-                  "urlencoded": [
-                    {
-                      "key": "name",
-                      "value": "ex",
-                      "description": "Updated name of the pet"
-                    },
-                    {
-                      "key": "status",
-                      "value": "eu",
-                      "description": "Updated status of the pet"
-                    }
-                  ]
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/pet/:petId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "pet",
-                    ":petId"
-                  ],
-                  "variable": [
-                    {
-                      "key": "petId",
-                      "value": "-8609067",
-                      "description": "(Required) ID of pet that needs to be updated"
-                    }
-                  ]
-                }
-              },
-              "status": "Method Not Allowed",
-              "code": 405,
               "_postman_previewlanguage": "text",
               "header": [
                 {

@@ -32,7 +32,7 @@ jobs:
       - name: Start Local Backend Server in Background
         run: |
           npm run turn-on-api &
-          npx wait-on http://localhost:3000 --timeout 60000
+          npx wait-on http://localhost:3000/products --timeout 60000
 
       - name: Run Postman Tests via Newman and Generate Index
         run: |

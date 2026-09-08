@@ -26,19 +26,22 @@
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
                   "});",
                   "",
-                  "pm.test(\"Response body is an array\", function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.be.an(\"array\");",
-                  "});",
+                  "const productsListSchema = {",
+                  "    \"type\": \"array\",",
+                  "    \"items\": {",
+                  "        \"type\": \"object\",",
+                  "        \"required\": [\"id\", \"name\", \"price\", \"sku\"],",
+                  "        \"properties\": {",
+                  "            \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "            \"name\": { \"type\": \"string\" },",
+                  "            \"price\": { \"type\": \"number\" },",
+                  "            \"sku\": { \"type\": [\"string\", \"number\"] }",
+                  "        }",
+                  "    }",
+                  "};",
                   "",
-                  "pm.test(\"Each item in the array has properties: id, name, price, sku\", function () {",
-                  "    const json = pm.response.json();",
-                  "    json.forEach(function (item) {",
-                  "        pm.expect(item).to.have.property(\"id\");",
-                  "        pm.expect(item).to.have.property(\"name\");",
-                  "        pm.expect(item).to.have.property(\"price\");",
-                  "        pm.expect(item).to.have.property(\"sku\");",
-                  "    });",
+                  "pm.test(\"Response body matches Products List JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(productsListSchema);",
                   "});"
                 ]
               }
@@ -65,7 +68,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
@@ -75,24 +77,30 @@
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
                   "});",
                   "",
-                  "pm.test(\"Response body is an object\", function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.be.an(\"object\");",
+                  "const productSchema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [\"id\", \"name\", \"price\", \"sku\"],",
+                  "    \"properties\": {",
+                  "        \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "        \"name\": { \"type\": \"string\" },",
+                  "        \"price\": { \"type\": \"number\" },",
+                  "        \"sku\": { \"type\": [\"string\", \"number\"] }",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test(\"Response body matches Product JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(productSchema);",
                   "});",
                   "",
-                  "pm.test(\"Response body has properties: id, name, price, sku\", function () {",
+                  "pm.test(\"Response body id equals expected value\", function () {",
                   "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property(\"id\");",
-                  "    pm.expect(json).to.have.property(\"name\");",
-                  "    pm.expect(json).to.have.property(\"price\");",
-                  "    pm.expect(json).to.have.property(\"sku\");",
-                  "});",
-                  "",
-                  "pm.test(\"Response body id equals 3\", function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json.id).to.eql(3);",
+                  "    const expectedId = pm.collectionVariables.get(\"productId\") || 4;",
+                  "    pm.expect(json.id).to.eql(isNaN(expectedId) ? expectedId : Number(expectedId));",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -100,13 +108,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/products/3",
+              "raw": "{{baseUrl}}/products/{{productId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "products",
-                "3"
+                "{{productId}}"
               ]
             }
           },
@@ -118,7 +126,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
@@ -128,27 +135,36 @@
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
                   "});",
                   "",
-                  "pm.test(\"Response body is an object with property id\", function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.be.an(\"object\");",
-                  "    pm.expect(json).to.have.property(\"id\");",
+                  "const createProductSchema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [\"id\"],",
+                  "    \"properties\": {",
+                  "        \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "        \"name\": { \"type\": \"string\" },",
+                  "        \"price\": { \"type\": \"number\" },",
+                  "        \"sku\": { \"type\": [\"string\", \"number\"] }",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test(\"Response body matches Create Product JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(createProductSchema);",
                   "});",
                   "",
-                  "pm.test(\"Response body name equals orange\", function () {",
+                  "pm.test(\"Response body values match request payload\", function () {",
                   "    const json = pm.response.json();",
                   "    pm.expect(json.name).to.eql(\"orange\");",
-                  "});",
-                  "",
-                  "pm.test(\"Response body price equals 8\", function () {",
-                  "    const json = pm.response.json();",
                   "    pm.expect(json.price).to.eql(8);",
+                  "    pm.expect(json.sku).to.eql(123321123);",
                   "});",
                   "",
-                  "pm.test(\"Response body sku equals 123321123\", function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json.sku).to.eql(123321123);",
-                  "});"
-                ]
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "    pm.collectionVariables.set(\"productId\", json.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -182,7 +198,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
@@ -192,14 +207,18 @@
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
                   "});",
                   "",
-                  "pm.test(\"Response body is an object\", function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.be.an(\"object\");",
-                  "});",
+                  "const updateProductSchema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [\"id\"],",
+                  "    \"properties\": {",
+                  "        \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "        \"name\": { \"type\": \"string\" },",
+                  "        \"price\": { \"type\": \"number\" }",
+                  "    }",
+                  "};",
                   "",
-                  "pm.test(\"Response body has property id\", function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property(\"id\");",
+                  "pm.test(\"Response body matches Update Product JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(updateProductSchema);",
                   "});",
                   "",
                   "pm.test(\"Response body name equals banana\", function () {",
@@ -211,7 +230,10 @@
                   "    const json = pm.response.json();",
                   "    pm.expect(json.price).to.eql(155);",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -220,7 +242,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id\": 4,\r\n    \"name\": \"banana\",\r\n    \"price\": 155,\r\n    \"sku\": 123321123,\r\n    \"description\": \"changed description\"\r\n}",
+              "raw": "{\r\n    \"id\": \"{{productId}}\",\r\n    \"name\": \"banana\",\r\n    \"price\": 155,\r\n    \"sku\": 123321123,\r\n    \"description\": \"changed description\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -245,7 +267,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200 or 204\", function () {",
                   "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
@@ -254,7 +275,10 @@
                   "pm.test(\"Response time is less than 2000ms\", function () {",
                   "    pm.expect(pm.response.responseTime).to.be.below(2000);",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -262,13 +286,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/products/4",
+              "raw": "{{baseUrl}}/products/{{productId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "products",
-                "4"
+                "{{productId}}"
               ]
             }
           },
@@ -295,18 +319,21 @@
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
                   "});",
                   "",
-                  "pm.test(\"Response body is an array\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an(\"array\");",
-                  "});",
+                  "const ordersListSchema = {",
+                  "    \"type\": \"array\",",
+                  "    \"items\": {",
+                  "        \"type\": \"object\",",
+                  "        \"required\": [\"id\", \"name\", \"sku\"],",
+                  "        \"properties\": {",
+                  "            \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "            \"name\": { \"type\": \"string\" },",
+                  "            \"sku\": { \"type\": [\"string\", \"number\"] }",
+                  "        }",
+                  "    }",
+                  "};",
                   "",
-                  "pm.test(\"Each item in the array has properties: id, name, sku\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    jsonData.forEach(function (item) {",
-                  "        pm.expect(item).to.have.property(\"id\");",
-                  "        pm.expect(item).to.have.property(\"name\");",
-                  "        pm.expect(item).to.have.property(\"sku\");",
-                  "    });",
+                  "pm.test(\"Response body matches Orders List JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(ordersListSchema);",
                   "});"
                 ]
               }
@@ -333,7 +360,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
@@ -343,23 +369,29 @@
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
                   "});",
                   "",
-                  "pm.test(\"Response body is an object\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an(\"object\");",
+                  "const orderSchema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [\"id\", \"name\", \"sku\"],",
+                  "    \"properties\": {",
+                  "        \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "        \"name\": { \"type\": \"string\" },",
+                  "        \"sku\": { \"type\": [\"string\", \"number\"] }",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test(\"Response body matches Order JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(orderSchema);",
                   "});",
                   "",
-                  "pm.test(\"Response body has properties: id, name, sku\", function () {",
+                  "pm.test(\"Response body id equals expected value\", function () {",
                   "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property(\"id\");",
-                  "    pm.expect(jsonData).to.have.property(\"name\");",
-                  "    pm.expect(jsonData).to.have.property(\"sku\");",
-                  "});",
-                  "",
-                  "pm.test(\"Response body id equals 3\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.id).to.eql(3);",
+                  "    const expectedId = pm.collectionVariables.get(\"orderId\") || 4;",
+                  "    pm.expect(jsonData.id).to.eql(isNaN(expectedId) ? expectedId : Number(expectedId));",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -367,13 +399,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/orders/3",
+              "raw": "{{baseUrl}}/orders/{{orderId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "orders",
-                "3"
+                "{{orderId}}"
               ]
             }
           },
@@ -385,7 +417,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
@@ -395,22 +426,34 @@
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
                   "});",
                   "",
-                  "pm.test(\"Response body is an object with property id\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an(\"object\");",
-                  "    pm.expect(jsonData).to.have.property(\"id\");",
+                  "const createOrderSchema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [\"id\"],",
+                  "    \"properties\": {",
+                  "        \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "        \"name\": { \"type\": \"string\" },",
+                  "        \"sku\": { \"type\": [\"string\", \"number\"] }",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test(\"Response body matches Create Order JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(createOrderSchema);",
                   "});",
                   "",
-                  "pm.test(\"Response body name equals order5\", function () {",
+                  "pm.test(\"Response body values match request payload\", function () {",
                   "    const jsonData = pm.response.json();",
                   "    pm.expect(jsonData.name).to.eql(\"order5\");",
+                  "    pm.expect(jsonData.sku).to.eql(123425445656765);",
                   "});",
                   "",
-                  "pm.test(\"Response body sku equals 123425445656765\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.sku).to.eql(123425445656765);",
-                  "});"
-                ]
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.collectionVariables.set(\"orderId\", jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -444,7 +487,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
@@ -454,21 +496,27 @@
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
                   "});",
                   "",
-                  "pm.test(\"Response body is an object\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an(\"object\");",
-                  "});",
+                  "const updateOrderSchema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [\"id\"],",
+                  "    \"properties\": {",
+                  "        \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "        \"name\": { \"type\": \"string\" }",
+                  "    }",
+                  "};",
                   "",
-                  "pm.test(\"Response body has property id\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property(\"id\");",
+                  "pm.test(\"Response body matches Update Order JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(updateOrderSchema);",
                   "});",
                   "",
                   "pm.test(\"Response body name equals order5\", function () {",
                   "    const jsonData = pm.response.json();",
                   "    pm.expect(jsonData.name).to.eql(\"order5\");",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -477,7 +525,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"id\": 4,\r\n    \"name\": \"order5\",\r\n    \"sku\": 123425445656765\r\n}",
+              "raw": "{\r\n    \"id\": \"{{orderId}}\",\r\n    \"name\": \"order5\",\r\n    \"sku\": 123425445656765\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -502,7 +550,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status code is 200 or 204\", function () {",
                   "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
@@ -511,7 +558,10 @@
                   "pm.test(\"Response time is less than 2000ms\", function () {",
                   "    pm.expect(pm.response.responseTime).to.be.below(2000);",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -519,13 +569,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/orders/4",
+              "raw": "{{baseUrl}}/orders/{{orderId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "orders",
-                "4"
+                "{{orderId}}"
               ]
             }
           },
@@ -544,7 +594,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Content-Type header includes application/json\", function () {\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});\n\npm.test(\"Response body is an array\", function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData).to.be.an(\"array\");\n});\n\npm.test(\"Each item has properties: id, firstName, lastName, email, status\", function () {\n    const jsonData = pm.response.json();\n    jsonData.forEach(function (user) {\n        pm.expect(user).to.have.property(\"id\");\n        pm.expect(user).to.have.property(\"firstName\");\n        pm.expect(user).to.have.property(\"lastName\");\n        pm.expect(user).to.have.property(\"email\");\n        pm.expect(user).to.have.property(\"status\");\n    });\n});"
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Content-Type header includes application/json\", function () {\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});\n\nconst usersListSchema = {\n    \"type\": \"array\",\n    \"items\": {\n        \"type\": \"object\",\n        \"required\": [\"id\", \"firstName\", \"lastName\", \"email\", \"status\"],\n        \"properties\": {\n            \"id\": { \"type\": [\"string\", \"number\"] },\n            \"firstName\": { \"type\": \"string\" },\n            \"lastName\": { \"type\": \"string\" },\n            \"email\": { \"type\": \"string\" },\n            \"status\": { \"type\": \"string\" }\n        }\n    }\n};\n\npm.test(\"Response body matches Users List JSON schema\", function () {\n    pm.response.to.have.jsonSchema(usersListSchema);\n});"
                 ]
               }
             }
@@ -570,13 +620,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/3",
+              "raw": "{{baseUrl}}/users/{{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "users",
-                "3"
+                "{{userId}}"
               ]
             }
           },
@@ -588,10 +638,47 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
-                  "\npm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});\n\npm.test(\"Content-Type header includes application/json\", function () {\n    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});\n\npm.test(\"Response body is an object with property id\", function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData).to.be.an(\"object\");\n    pm.expect(jsonData).to.have.property(\"id\");\n});\n\npm.test(\"Response body firstName equals Dream\", function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData.firstName).to.eql(\"Dream\");\n});\n\npm.test(\"Response body lastName equals Real\", function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData.lastName).to.eql(\"Real\");\n});\n\npm.test(\"Response body email equals dream.real@gmail.com\", function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData.email).to.eql(\"dream.real@gmail.com\");\n});\n\npm.test(\"Response body status equals active\", function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData.status).to.eql(\"active\");\n});\n"
-                ]
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type header includes application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "});",
+                  "",
+                  "const createUserSchema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [\"id\"],",
+                  "    \"properties\": {",
+                  "        \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "        \"firstName\": { \"type\": \"string\" },",
+                  "        \"lastName\": { \"type\": \"string\" },",
+                  "        \"email\": { \"type\": \"string\" },",
+                  "        \"status\": { \"type\": \"string\" }",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test(\"Response body matches Create User JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(createUserSchema);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body user details match input\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.firstName).to.eql(\"Dream\");",
+                  "    pm.expect(jsonData.lastName).to.eql(\"Real\");",
+                  "    pm.expect(jsonData.email).to.eql(\"dream.real@gmail.com\");",
+                  "    pm.expect(jsonData.status).to.eql(\"active\");",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "    pm.collectionVariables.set(\"userId\", jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -625,9 +712,7 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
-                  "",
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
@@ -636,37 +721,33 @@
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
                   "});",
                   "",
-                  "pm.test(\"Response body is an object\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an(\"object\");",
+                  "const updateUserSchema = {",
+                  "    \"type\": \"object\",",
+                  "    \"required\": [\"id\"],",
+                  "    \"properties\": {",
+                  "        \"id\": { \"type\": [\"string\", \"number\"] },",
+                  "        \"firstName\": { \"type\": \"string\" },",
+                  "        \"lastName\": { \"type\": \"string\" },",
+                  "        \"email\": { \"type\": \"string\" },",
+                  "        \"status\": { \"type\": \"string\" }",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test(\"Response body matches Update User JSON schema\", function () {",
+                  "    pm.response.to.have.jsonSchema(updateUserSchema);",
                   "});",
                   "",
-                  "pm.test(\"Response body has property id\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property(\"id\");",
-                  "});",
-                  "",
-                  "pm.test(\"Response body firstName equals Ilon\", function () {",
+                  "pm.test(\"Response body user details match updated values\", function () {",
                   "    const jsonData = pm.response.json();",
                   "    pm.expect(jsonData.firstName).to.eql(\"Ilon\");",
-                  "});",
-                  "",
-                  "pm.test(\"Response body lastName equals Mask\", function () {",
-                  "    const jsonData = pm.response.json();",
                   "    pm.expect(jsonData.lastName).to.eql(\"Mask\");",
-                  "});",
-                  "",
-                  "pm.test(\"Response body email equals ilon.mask@gmail.com\", function () {",
-                  "    const jsonData = pm.response.json();",
                   "    pm.expect(jsonData.email).to.eql(\"ilon.mask@gmail.com\");",
-                  "});",
-                  "",
-                  "pm.test(\"Response body status equals active\", function () {",
-                  "    const jsonData = pm.response.json();",
                   "    pm.expect(jsonData.status).to.eql(\"active\");",
-                  "});",
-                  ""
-                ]
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -675,7 +756,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"firstName\": \"Ilon\",\r\n    \"lastName\": \"Mask\",\r\n    \"email\": \"ilon.mask@gmail.com\",\r\n    \"dateOfBirth\": \"2001-10-99\",\r\n    \"emailVerified\": true,\r\n    \"signUpDate\": \"2019-08-24\",\r\n    \"status\": \"active\",\r\n    \"level\": \"lord\",\r\n    \"id\": 10\r\n}",
+              "raw": "{\r\n    \"firstName\": \"Ilon\",\r\n    \"lastName\": \"Mask\",\r\n    \"email\": \"ilon.mask@gmail.com\",\r\n    \"dateOfBirth\": \"2001-10-99\",\r\n    \"emailVerified\": true,\r\n    \"signUpDate\": \"2019-08-24\",\r\n    \"status\": \"active\",\r\n    \"level\": \"lord\",\r\n    \"id\": \"{{userId}}\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -700,10 +781,18 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
-                  "\npm.test(\"Status code is 200 or 204\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 204]);\n});\n\npm.test(\"Response time is less than 2000ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n"
-                ]
+                  "pm.test(\"Status code is 200 or 204\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is less than 2000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -711,13 +800,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/10",
+              "raw": "{{baseUrl}}/users/{{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "users",
-                "10"
+                "{{userId}}"
               ]
             }
           },
@@ -750,6 +839,18 @@
     {
       "key": "baseUrl",
       "value": "http://localhost:3000"
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
     }
   ]
 }

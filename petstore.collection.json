@@ -741,7 +741,7 @@
               "variable": [
                 {
                   "key": "petId",
-                  "value": "321",
+                  "value": "123",
                   "description": "(Required) Pet id to delete"
                 }
               ]
